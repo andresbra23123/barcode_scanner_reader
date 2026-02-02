@@ -17,11 +17,32 @@ class MainActivity : FlutterActivity() {
 
     private val scannerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "android.intent.ACTION_DECODE_DATA") {
-                val code = intent.getStringExtra("barcode_string")
-                if (!code.isNullOrEmpty()) {
-                    eventSink?.success(code)
+            if (intent == null) return
+
+            val action = intent.action ?: return
+
+            val code: String? = when (action) {
+
+                // ✅ UROVO
+                "android.intent.ACTION_DECODE_DATA" -> {
+                    intent.getStringExtra("barcode_string")
                 }
+
+                // ✅ HONEYWELL
+                "com.honeywell.intent.action.BARCODE" -> {
+                    intent.getStringExtra("data")
+                }
+
+                // ✅ ZEBRA (DataWedge)
+                "com.symbol.datawedge.api.RESULT_ACTION" -> {
+                    intent.getStringExtra("com.symbol.datawedge.data_string")
+                }
+
+                else -> null
+            }
+
+            if (!code.isNullOrEmpty()) {
+                eventSink?.success(code)
             }
         }
     }
@@ -36,7 +57,12 @@ class MainActivity : FlutterActivity() {
 
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 eventSink = events
-                val filter = IntentFilter("android.intent.ACTION_DECODE_DATA")
+
+                val filter = IntentFilter().apply {
+                    addAction("android.intent.ACTION_DECODE_DATA") // Urovo
+                    addAction("com.honeywell.intent.action.BARCODE") // Honeywell
+                    addAction("com.symbol.datawedge.api.RESULT_ACTION") // Zebra
+                }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     registerReceiver(
