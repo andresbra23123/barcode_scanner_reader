@@ -28,15 +28,22 @@ class MainActivity : FlutterActivity() {
                     intent.getStringExtra("barcode_string")
                 }
 
-                // ✅ HONEYWELL
+                //>>>>>>>> pendiente    ✅ HONEYWELL
                 "com.honeywell.intent.action.BARCODE" -> {
                     intent.getStringExtra("data")
                 }
 
                 // ✅ ZEBRA (DataWedge)
-                "com.symbol.datawedge.api.RESULT_ACTION" -> {
+                "zebra" -> {
                     intent.getStringExtra("com.symbol.datawedge.data_string")
                 }
+
+                // >>>>>>>>  pendiente   ✅ chainway (DataWedge) 
+                "com.infowedge.data" -> {
+                    intent.getStringExtra("data_string")
+                }
+
+                
 
                 else -> null
             }
@@ -61,7 +68,8 @@ class MainActivity : FlutterActivity() {
                 val filter = IntentFilter().apply {
                     addAction("android.intent.ACTION_DECODE_DATA") // Urovo
                     addAction("com.honeywell.intent.action.BARCODE") // Honeywell
-                    addAction("com.symbol.datawedge.api.RESULT_ACTION") // Zebra
+                    addAction("zebra") // Zebra
+                    addAction("com.infowedge.data") // chainway
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
